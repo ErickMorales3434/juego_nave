@@ -32,27 +32,60 @@ void OcultarCursor() {
     SetConsoleCursorInfo(hCon,&cci);
 }
 
+class NAVE {
+    int x, y;
+public:
+    NAVE(int _x, int _y);
+    void pintar();
+    void borrar();
+    void mover();
+};
+
+NAVE::NAVE(int _x, int _y) {
+    x = _x;
+    y = _y;
+}
+
+void NAVE::pintar() {
+    gotoxy(x, y);
+    cout << " % c",30;
+    gotoxy(x, y+1);
+    cout << "%c%c%c", 40, 207, 41;
+    gotoxy(x, y+2);
+    cout << "%c%c %c%c", 30, 190, 190,30;
+}
+void NAVE::borrar() {
+    gotoxy(x, y);
+    cout << "         ";
+    gotoxy(x, y+1);
+    cout << "         ";
+    gotoxy(x, y+2);
+    cout << "         ";
+}
+void NAVE::mover(){
+    if (_kbhit()) {
+        char tecla = _getch();
+        borrar();
+        if (tecla == IZQUIERDA) x--;
+        if (tecla == DERECHA) x++;
+        if (tecla == ARRIBA) y--;
+        if (tecla == ABAJO) y++;
+        pintar();
+    }
+ }
+
 
 int main() {
     OcultarCursor();
-    int x = 10, y = 10;
-    gotoxy(10, 10);
-    cout << "*";
+    NAVE MINAVE(7, 7);
+    MINAVE.pintar();
+
+
     bool game_over = false;
     while (!game_over) {
 
 
-        if (_kbhit()) {
-            char tecla = _getch();
-            gotoxy(x, y);
-            cout << " ";
-            if (tecla == IZQUIERDA) x--;
-            if (tecla == DERECHA) x++;
-            if (tecla == ARRIBA) y--;
-            if (tecla == ABAJO) y++;
-            gotoxy(x, y);
-            cout << "*";
-        }
+        MINAVE.mover();
         Sleep(30);
 
 
