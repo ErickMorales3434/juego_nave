@@ -3,6 +3,8 @@
 #include <windows.h>
 #include <conio.h>
 #include <stdlib.h>
+#include <list>
+
 
 
 #define ARRIBA 72
@@ -68,6 +70,11 @@ class NAVE {
     int vidas;
 public:
     NAVE(int _x, int _y, int _corazones,int _vidas): x(_x),y(_y),corazones(_corazones),vidas(_vidas){}
+    int X() { return x; };
+    int Y() { return y; };
+    void COR() {
+        corazones--;
+    }
     void pintar();
     void borrar();
     void mover();
@@ -168,6 +175,8 @@ public:
     ASTEROIDE(int _x, int _y) : x(_x), y(_y) {}
     void pintar();
     void mover();
+    void choque(class NAVE &N);
+
 };
 
 void ASTEROIDE::pintar() {
@@ -186,30 +195,80 @@ void ASTEROIDE::mover() {
     pintar();
 }
 
+void ASTEROIDE::choque(class NAVE& N) {
+    //verifica la posicion de la nave con el asteroide
+    if (x >= N.X() && x <= N.X() + 7 && y >= N.Y() && y <= N.Y() + 2)
+    {
+        N.COR();
+        N.borrar();
+        N, pintar();
+        N.pintar_corazones();
+        x = rand() % 71 + 4;
+        y = 4;
+    }
+}
+
+class BALA {
+    int x, y;
+public:
+    BALA(int _x, int _y) : x(_x), y(_y) {}
+    void mover();
+};
+
+void BALA::mover() {
+    gotoxy(x,y);
+    cout << "  ";
+    if (y > 4) y--;
+    gotoxy(x, y);
+    cout << "*";
+}
+
 int main() {
 
     OcultarCursor();
     pintar_limites();
-    NAVE MINAVE(7, 7,3,3);
+    NAVE MINAVE(7, 7, 3, 3);
     MINAVE.pintar();
     MINAVE.pintar_corazones();
 
-    ASTEROIDE EL_ASTEROIDE(10, 4);
+    ASTEROIDE EL_ASTEROIDE(10, 4), ast1(15, 10), ast2(1, 3), ast3(5, 4);
 
-
+    list<BALA*> B;
+    list<BALA*>::iterator it;
 
     bool game_over = false;
     while (!game_over) {
 
+        if (_kbhit()) {
+            char tecla = _getch();
+            if (tecla == 'a')
+                B.push_back(new BALA(MINAVE.X() + 2, MINAVE.Y() - 1));
+        };
+
+        for (it = B.begin();it != B.end(); it++) {
+            (*it)->mover();
+        }
+
+
         EL_ASTEROIDE.mover();
+        EL_ASTEROIDE.choque(MINAVE);
+
+        ast1.mover();
+        ast1.choque(MINAVE);
+        ast2.mover();
+        ast2.choque(MINAVE);
+        ast3.mover();
+        ast3.choque(MINAVE);
+
         MINAVE.morir();
         MINAVE.mover();
         Sleep(30);
 
 
-
-
     }
-        return 0;
+
+
+    
+return 0;
     
 }
