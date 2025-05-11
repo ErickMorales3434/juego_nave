@@ -1,4 +1,4 @@
-#include <stdio.h>
+ï»¿#include <stdio.h>
 #include <iostream>
 #include <windows.h>
 #include <conio.h>
@@ -38,17 +38,17 @@ void OcultarCursor() {
 }
 void pintar_limites() {
     //pintar parte superior e inferior de la pantalla
-    for (int i = 2; i < 78;i++) {
+    for (int i = 2; i < 130;i++) {
         gotoxy(i, 3);
         cout << (char)205;
-        gotoxy(i, 33);
+        gotoxy(i, 50);
         cout << (char)205;
     }
     //pintar partes laterales de la pantalla
-    for (int i = 4;i < 33;i++) {
+    for (int i = 4;i < 50;i++) {
         gotoxy(2, i);
         cout << (char)186;
-        gotoxy(77, i);
+        gotoxy(130, i);
         cout << (char)186;
     }
     //pintar extremos de la pantalla
@@ -56,13 +56,13 @@ void pintar_limites() {
     gotoxy(2, 3);
     cout << (char)201;
     //abajo
-    gotoxy(2, 33);
+    gotoxy(2, 50);
     cout << (char)200;
     //derecha
-    gotoxy(77, 3);
+    gotoxy(130, 3);
     cout << (char)187;
     //izquiera
-    gotoxy(77, 33);
+    gotoxy(130, 50);
     cout << (char)188;
 }
 
@@ -84,7 +84,7 @@ public:
     void morir();
 
     void mover_izquierda() {
-        if (x > 1) {
+        if (x > 5) {
             borrar();
             x--;
             pintar();
@@ -92,7 +92,7 @@ public:
     }
 
     void mover_derecha() {
-        if (x < 75) { // Ajusta según ancho de tu consola
+        if (x < 120) { //  segÃºn ancho de la consola
             borrar();
             x++;
             pintar();
@@ -100,7 +100,7 @@ public:
     }
 
     void mover_arriba() {
-        if (y > 1) {
+        if (y > 5) {
             borrar();
             y--;
             pintar();
@@ -108,22 +108,19 @@ public:
     }
 
     void mover_abajo() {
-        if (y < 20) { // Ajusta según alto de tu consola
+        if (y < 45) { // segÃºn alto de la consola
             borrar();
             y++;
             pintar();
         }
     }
-
-
+ 
 
 };
 
 
+
 void NAVE::pintar() {
-    //cout << " % c",30;
-    //cout << "%c%c%c", 40, 207, 41;
-    //cout << "%c%c %c%c", 30, 190, 190,30;
     gotoxy(x, y);
     printf(" /\\\n");
     gotoxy(x, y+1);
@@ -206,30 +203,35 @@ void NAVE::morir() {
     }
 }
 
-
-
-
 class ASTEROIDE {
     int x, y;
 public:
     ASTEROIDE(int _x, int _y) : x(_x), y(_y) {}
     void pintar();
     void mover();
+    void borrar();
     void choque(class NAVE &N);
 
 };
 
 void ASTEROIDE::pintar() {
     gotoxy(x, y);
-    cout << (char)184;
+    cout << " () ";
+    gotoxy(x, y+1);
+    cout << "()()()";
+}
+void ASTEROIDE::borrar() {
+    gotoxy(x, y);     cout << "      ";
+    gotoxy(x, y + 1); cout << "      ";
 }
 
 void ASTEROIDE::mover() {
+    borrar();
     gotoxy(x, y);
     cout << " ";
     y++;
     if (y > 32) {
-        x = rand() % 71 + 4;
+        x = rand() % 110 + 4;
         y = 4;
     }
     pintar();
@@ -252,22 +254,13 @@ class BALA {
     int x, y;
 public:
     BALA(int _x, int _y) : x(_x), y(_y) {}
-   /* void mover();*/
 
-
-//void BALA::mover() {
-//    gotoxy(x,y);
-//    cout << "  ";
-//    if (y > 4) y--;
-//    gotoxy(x, y);
-//    cout << "*";
-//}
 int Y() { return y; }
 
 void mover() {
     borrar();
 
-    y--; // sube la bala (asumiendo arriba es menor y)
+    y--; // sube la bala hasta la posicion  y = 4)
 
     if (y > 0) {
         pintar();
@@ -285,7 +278,7 @@ void borrar() {
 }
 
 bool fuera_de_pantalla() {
-    return (y <= 1); // puedes ajustar si tu borde superior está en otra posición
+    return (y <= 4); // posicion donde la bala desaparece
 }
 };
 
@@ -308,7 +301,7 @@ int main() {
     while (!game_over) {
         auto frameStart = high_resolution_clock::now();
 
-        // ?? Detectar teclas presionadas
+        // ðŸ‘‡ Detectar teclas presionadas
         if (GetAsyncKeyState(VK_LEFT) & 0x8000) {
             MINAVE.mover_izquierda();
         }
@@ -350,66 +343,17 @@ int main() {
                     ast3.choque(MINAVE);
             
                     MINAVE.morir();
-                    //MINAVE.mover();
-        // tu lógica de juego aquí
-        // ...
-
+                 
         auto frameEnd = high_resolution_clock::now();
         auto elapsed = duration_cast<milliseconds>(frameEnd - frameStart);
 
         if (elapsed.count() < frameDelay) {
-            // ? Conversión explícita a std::chrono::milliseconds
+           //delay en milisegundos
             std::this_thread::sleep_for(milliseconds(frameDelay - elapsed.count()));
         }
 
     }
-
-
-//
-//    OcultarCursor();
-//    pintar_limites();
-//    NAVE MINAVE(7, 7, 3, 3);
-//    MINAVE.pintar();
-//    MINAVE.pintar_corazones();
-//
-//    ASTEROIDE EL_ASTEROIDE(10, 4), ast1(15, 10), ast2(1, 3), ast3(5, 4);
-//
-//    list<BALA*> B;
-//    list<BALA*>::iterator it;
-//
-//    bool game_over = false;
-//    while (!game_over) {
-//
-//        if (_kbhit()) {
-//            char tecla = _getch();
-//            if (tecla == 'a')
-//                B.push_back(new BALA(MINAVE.X() + 2, MINAVE.Y() - 1));
-//        };
-//
-//        for (it = B.begin();it != B.end(); it++) {
-//            (*it)->mover();
-//        }
-//
-//
-//        EL_ASTEROIDE.mover();
-//        EL_ASTEROIDE.choque(MINAVE);
-//
-//        /*ast1.mover();
-//        ast1.choque(MINAVE);
-//        ast2.mover();
-//        ast2.choque(MINAVE);
-//        ast3.mover();
-//        ast3.choque(MINAVE);*/
-//
-//        MINAVE.morir();
-//        MINAVE.mover();
-//        Sleep(30);
-//
-//
-//    }
-
-
-    
+        
 return 0;
     
 }
