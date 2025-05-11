@@ -216,9 +216,11 @@ public:
 
 void ASTEROIDE::pintar() {
     gotoxy(x, y);
-    cout << " () ";
+    cout << " o ";
     gotoxy(x, y+1);
-    cout << "()()()";
+    cout << "OoO";
+    gotoxy(x, y + 1);
+    cout << " o ";
 }
 void ASTEROIDE::borrar() {
     gotoxy(x, y);     cout << "      ";
@@ -230,9 +232,9 @@ void ASTEROIDE::mover() {
     gotoxy(x, y);
     cout << " ";
     y++;
-    if (y > 32) {
+    if (y > 48) {
         x = rand() % 110 + 4;
-        y = 4;
+        y = 6;
     }
     pintar();
 }
