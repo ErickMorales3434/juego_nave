@@ -5,7 +5,8 @@
 #include <stdlib.h>
 #include <list>
 
-
+#include <chrono>
+#include <thread>
 
 #define ARRIBA 72
 #define IZQUIERDA 75
@@ -13,6 +14,7 @@
 #define ABAJO 80
 
 using namespace std;
+using namespace std::chrono;
 
 void gotoxy(int x, int y) {
     HANDLE hCon;
@@ -80,6 +82,41 @@ public:
     void mover();
     void pintar_corazones();
     void morir();
+
+    void mover_izquierda() {
+        if (x > 1) {
+            borrar();
+            x--;
+            pintar();
+        }
+    }
+
+    void mover_derecha() {
+        if (x < 75) { // Ajusta según ancho de tu consola
+            borrar();
+            x++;
+            pintar();
+        }
+    }
+
+    void mover_arriba() {
+        if (y > 1) {
+            borrar();
+            y--;
+            pintar();
+        }
+    }
+
+    void mover_abajo() {
+        if (y < 20) { // Ajusta según alto de tu consola
+            borrar();
+            y++;
+            pintar();
+        }
+    }
+
+
+
 };
 
 
@@ -169,6 +206,9 @@ void NAVE::morir() {
     }
 }
 
+
+
+
 class ASTEROIDE {
     int x, y;
 public:
@@ -212,18 +252,45 @@ class BALA {
     int x, y;
 public:
     BALA(int _x, int _y) : x(_x), y(_y) {}
-    void mover();
-};
+   /* void mover();*/
 
-void BALA::mover() {
-    gotoxy(x,y);
-    cout << "  ";
-    if (y > 4) y--;
+
+//void BALA::mover() {
+//    gotoxy(x,y);
+//    cout << "  ";
+//    if (y > 4) y--;
+//    gotoxy(x, y);
+//    cout << "*";
+//}
+int Y() { return y; }
+
+void mover() {
+    borrar();
+
+    y--; // sube la bala (asumiendo arriba es menor y)
+
+    if (y > 0) {
+        pintar();
+    }
+}
+
+void pintar() {
     gotoxy(x, y);
     cout << "*";
 }
 
+void borrar() {
+    gotoxy(x, y);
+    cout << " ";
+}
+
+bool fuera_de_pantalla() {
+    return (y <= 1); // puedes ajustar si tu borde superior está en otra posición
+}
+};
+
 int main() {
+
 
     OcultarCursor();
     pintar_limites();
@@ -236,36 +303,110 @@ int main() {
     list<BALA*> B;
     list<BALA*>::iterator it;
 
+    int frameDelay = 33; // 33 ms para ~30 FPS
     bool game_over = false;
     while (!game_over) {
+        auto frameStart = high_resolution_clock::now();
 
-        if (_kbhit()) {
-            char tecla = _getch();
-            if (tecla == 'a')
-                B.push_back(new BALA(MINAVE.X() + 2, MINAVE.Y() - 1));
-        };
+        // ?? Detectar teclas presionadas
+        if (GetAsyncKeyState(VK_LEFT) & 0x8000) {
+            MINAVE.mover_izquierda();
+        }
+        if (GetAsyncKeyState(VK_RIGHT) & 0x8000) {
+            MINAVE.mover_derecha();
+        }
+        if (GetAsyncKeyState(VK_UP) & 0x8000) {
+            MINAVE.mover_arriba();
+        }
+        if (GetAsyncKeyState(VK_DOWN) & 0x8000) {
+            MINAVE.mover_abajo();
+        }
+        if (GetAsyncKeyState('A') & 0x8000) {
+            B.push_back(new BALA(MINAVE.X() + 2, MINAVE.Y() - 1));
+        }
 
-        for (it = B.begin();it != B.end(); it++) {
+        for (it = B.begin(); it != B.end();) {
             (*it)->mover();
+
+            if ((*it)->fuera_de_pantalla()) {
+                (*it)->borrar();
+                delete (*it);
+                it = B.erase(it);  // borra de la lista y avanza
+            }
+            else {
+                ++it;
+            }
         }
 
 
-        EL_ASTEROIDE.mover();
-        EL_ASTEROIDE.choque(MINAVE);
+                    EL_ASTEROIDE.mover();
+                    EL_ASTEROIDE.choque(MINAVE);
+            
+                    ast1.mover();
+                    ast1.choque(MINAVE);
+                    ast2.mover();
+                    ast2.choque(MINAVE);
+                    ast3.mover();
+                    ast3.choque(MINAVE);
+            
+                    MINAVE.morir();
+                    //MINAVE.mover();
+        // tu lógica de juego aquí
+        // ...
 
-        ast1.mover();
-        ast1.choque(MINAVE);
-        ast2.mover();
-        ast2.choque(MINAVE);
-        ast3.mover();
-        ast3.choque(MINAVE);
+        auto frameEnd = high_resolution_clock::now();
+        auto elapsed = duration_cast<milliseconds>(frameEnd - frameStart);
 
-        MINAVE.morir();
-        MINAVE.mover();
-        Sleep(30);
-
+        if (elapsed.count() < frameDelay) {
+            // ? Conversión explícita a std::chrono::milliseconds
+            std::this_thread::sleep_for(milliseconds(frameDelay - elapsed.count()));
+        }
 
     }
+
+
+//
+//    OcultarCursor();
+//    pintar_limites();
+//    NAVE MINAVE(7, 7, 3, 3);
+//    MINAVE.pintar();
+//    MINAVE.pintar_corazones();
+//
+//    ASTEROIDE EL_ASTEROIDE(10, 4), ast1(15, 10), ast2(1, 3), ast3(5, 4);
+//
+//    list<BALA*> B;
+//    list<BALA*>::iterator it;
+//
+//    bool game_over = false;
+//    while (!game_over) {
+//
+//        if (_kbhit()) {
+//            char tecla = _getch();
+//            if (tecla == 'a')
+//                B.push_back(new BALA(MINAVE.X() + 2, MINAVE.Y() - 1));
+//        };
+//
+//        for (it = B.begin();it != B.end(); it++) {
+//            (*it)->mover();
+//        }
+//
+//
+//        EL_ASTEROIDE.mover();
+//        EL_ASTEROIDE.choque(MINAVE);
+//
+//        /*ast1.mover();
+//        ast1.choque(MINAVE);
+//        ast2.mover();
+//        ast2.choque(MINAVE);
+//        ast3.mover();
+//        ast3.choque(MINAVE);*/
+//
+//        MINAVE.morir();
+//        MINAVE.mover();
+//        Sleep(30);
+//
+//
+//    }
 
 
     
