@@ -34,7 +34,7 @@ void OcultarCursor() {
     cci.dwSize = 5;
     cci.bVisible = FALSE;
 
-    SetConsoleCursorInfo(hCon,&cci);
+    SetConsoleCursorInfo(hCon, &cci);
 }
 void pintar_limites() {
     //pintar parte superior e inferior de la pantalla
@@ -71,9 +71,10 @@ class NAVE {
     int corazones;
     int vidas;
 public:
-    NAVE(int _x, int _y, int _corazones,int _vidas): x(_x),y(_y),corazones(_corazones),vidas(_vidas){}
+    NAVE(int _x, int _y, int _corazones, int _vidas) : x(_x), y(_y), corazones(_corazones), vidas(_vidas) {}
     int X() { return x; };
     int Y() { return y; };
+    int Vidas() { return vidas; }
     void COR() {
         corazones--;
     }
@@ -114,7 +115,7 @@ public:
             pintar();
         }
     }
- 
+
 
 };
 
@@ -123,9 +124,9 @@ public:
 void NAVE::pintar() {
     gotoxy(x, y);
     printf(" /\\\n");
-    gotoxy(x, y+1);
+    gotoxy(x, y + 1);
     printf(" ||\n");
-    gotoxy(x, y+2);
+    gotoxy(x, y + 2);
     printf("/__\\\n");
     gotoxy(x, y + 3);
     printf(" vv\n");
@@ -141,26 +142,26 @@ void NAVE::borrar() {
     gotoxy(x, y + 3);
     printf("         ");
 }
-void NAVE::mover(){
+void NAVE::mover() {
     if (_kbhit()) {
         char tecla = _getch();
         borrar();
-        if (tecla == IZQUIERDA && x>3) x--;
-        if (tecla == DERECHA && x+6 <77) x++;
+        if (tecla == IZQUIERDA && x > 3) x--;
+        if (tecla == DERECHA && x + 6 < 77) x++;
         if (tecla == ARRIBA && y > 4) y--;
-        if (tecla == ABAJO && y+3 < 33) y++;
+        if (tecla == ABAJO && y + 3 < 33) y++;
         if (tecla == 'e') corazones--;
         pintar();
         pintar_corazones();
     }
- }
+}
 //vidas en corazones
 void NAVE::pintar_corazones() {
 
     gotoxy(50, 2);
     cout << "VIDAS: " << vidas;
 
-    gotoxy(64,2);
+    gotoxy(64, 2);
     cout << "Salud: ";
     gotoxy(70, 2);
     cout << "    ";
@@ -174,11 +175,11 @@ void NAVE::morir() {
         borrar();
         gotoxy(x, y);
         cout << "   **   ";
-        gotoxy(x, y+1);
+        gotoxy(x, y + 1);
         cout << "  ****   ";
-        gotoxy(x, y+2);
+        gotoxy(x, y + 2);
         cout << "   **   ";
-        gotoxy(x, y+3);
+        gotoxy(x, y + 3);
         cout << "      ";
         Sleep(200);
 
@@ -210,16 +211,26 @@ public:
     void pintar();
     void mover();
     void borrar();
-    void choque(class NAVE &N);
+    void reiniciar();
+    void choque(class NAVE& N);
 
+    bool colision_con_bala(int bx, int by) {
+        return (bx >= x && bx <= x + 2 && by >= y && by <= y + 2);
+    }
+    
 };
+
+void ASTEROIDE::reiniciar() {
+    x = rand() % 110 + 4; // posición aleatoria horizontal
+    y = 4;                // arriba de la pantalla
+}
 
 void ASTEROIDE::pintar() {
     gotoxy(x, y);
     cout << " o ";
-    gotoxy(x, y+1);
-    cout << "OoO";
     gotoxy(x, y + 1);
+    cout << "OoO";
+    gotoxy(x, y + 2);
     cout << " o ";
 }
 void ASTEROIDE::borrar() {
@@ -230,7 +241,6 @@ void ASTEROIDE::borrar() {
 void ASTEROIDE::mover() {
     borrar();
     gotoxy(x, y);
-    cout << " ";
     y++;
     if (y > 48) {
         x = rand() % 110 + 4;
@@ -245,7 +255,7 @@ void ASTEROIDE::choque(class NAVE& N) {
     {
         N.COR();
         N.borrar();
-        N, pintar();
+        N.pintar();
         N.pintar_corazones();
         x = rand() % 71 + 4;
         y = 4;
@@ -256,42 +266,49 @@ class BALA {
     int x, y;
 public:
     BALA(int _x, int _y) : x(_x), y(_y) {}
+    int X() { return x; }
+    int Y() { return y; }
 
-int Y() { return y; }
+    void mover() {
+        borrar();
 
-void mover() {
-    borrar();
+        y--; // sube la bala hasta la posicion  y = 4)
 
-    y--; // sube la bala hasta la posicion  y = 4)
-
-    if (y > 0) {
-        pintar();
+        if (y > 0) {
+            pintar();
+        }
     }
-}
 
-void pintar() {
-    gotoxy(x, y);
-    cout << "*";
-}
+    void pintar() {
+        gotoxy(x, y);
+        cout << "*";
+    }
 
-void borrar() {
-    gotoxy(x, y);
-    cout << " ";
-}
+    void borrar() {
+        gotoxy(x, y);
+        cout << " ";
+    }
 
-bool fuera_de_pantalla() {
-    return (y <= 4); // posicion donde la bala desaparece
-}
+    bool fuera_de_pantalla() {
+        return (y <= 4); // posicion donde la bala desaparece
+    }
 };
+
+
+void mostrar_puntos(int puntos) {
+    gotoxy(5, 2);
+    cout << "Puntos: " << puntos;
+}
 
 int main() {
 
-
+    int puntos = 0;
     OcultarCursor();
     pintar_limites();
     NAVE MINAVE(7, 7, 3, 3);
     MINAVE.pintar();
     MINAVE.pintar_corazones();
+    mostrar_puntos(puntos);
 
     ASTEROIDE EL_ASTEROIDE(10, 4), ast1(15, 10), ast2(1, 3), ast3(5, 4);
 
@@ -332,30 +349,83 @@ int main() {
                 ++it;
             }
         }
+        // colision de las balas
+        for (it = B.begin(); it != B.end();) {
+            (*it)->mover();
+
+            bool colision = false;
+
+            if (EL_ASTEROIDE.colision_con_bala((*it)->X(), (*it)->Y())) {
+                EL_ASTEROIDE.reiniciar();
+                colision = true;
+            }
+            else if (ast1.colision_con_bala((*it)->X(), (*it)->Y())) {
+                ast1.reiniciar();
+                colision = true;
+            }
+            else if (ast2.colision_con_bala((*it)->X(), (*it)->Y())) {
+                ast2.reiniciar();
+                colision = true;
+            }
+            else if (ast3.colision_con_bala((*it)->X(), (*it)->Y())) {
+                ast3.reiniciar();
+                colision = true;
+            }
+
+            if (colision) {
+                (*it)->borrar();
+                delete (*it);
+                it = B.erase(it);
+                puntos += 10;
+                mostrar_puntos(puntos);
+            }
+            else if ((*it)->fuera_de_pantalla()) {
+                (*it)->borrar();
+                delete (*it);
+                it = B.erase(it);
+            }
+            else {
+                ++it;
+            }
+        }
 
 
-                    EL_ASTEROIDE.mover();
-                    EL_ASTEROIDE.choque(MINAVE);
-            
-                    ast1.mover();
-                    ast1.choque(MINAVE);
-                    ast2.mover();
-                    ast2.choque(MINAVE);
-                    ast3.mover();
-                    ast3.choque(MINAVE);
-            
-                    MINAVE.morir();
-                 
+
+        EL_ASTEROIDE.mover();
+        EL_ASTEROIDE.choque(MINAVE);
+
+        ast1.mover();
+        ast1.choque(MINAVE);
+        ast2.mover();
+        ast2.choque(MINAVE);
+        ast3.mover();
+        ast3.choque(MINAVE);
+
+        MINAVE.morir();
+        if (MINAVE.Vidas() == 0) {
+            game_over = true;
+        }
+        if (game_over) {
+            system("cls"); // Limpia la pantalla
+            gotoxy(50, 20);
+            cout << "     G A M E   O V E R";
+            gotoxy(48, 22);
+            cout << "Puntaje final: " << puntos;
+            gotoxy(45, 24);
+            cout << "Presiona una tecla para salir...";
+            _getch();
+        }
+
         auto frameEnd = high_resolution_clock::now();
         auto elapsed = duration_cast<milliseconds>(frameEnd - frameStart);
 
         if (elapsed.count() < frameDelay) {
-           //delay en milisegundos
+            //delay en milisegundos
             std::this_thread::sleep_for(milliseconds(frameDelay - elapsed.count()));
         }
 
     }
-        
-return 0;
-    
+    system("pause");
+    return 0;
+
 }
