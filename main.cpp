@@ -123,24 +123,26 @@ public:
 
 void NAVE::pintar() {
     gotoxy(x, y);
-    printf(" /\\\n");
+    //printf(" /\\\n");
+    cout << "  /\\";
     gotoxy(x, y + 1);
-    printf(" ||\n");
+    //printf(" ||\n");
+    cout << " /==\\";
     gotoxy(x, y + 2);
-    printf("/__\\\n");
-    gotoxy(x, y + 3);
-    printf(" vv\n");
+    //printf("/__\\\n");
+    cout << " \\vv/";
+    //gotoxy(x, y + 3);
+    //printf(" vv\n");
 
 }
 void NAVE::borrar() {
     gotoxy(x, y);
-    printf("          ");
+    printf("      ");
     gotoxy(x, y + 1);
-    printf("          ");
+    printf("      ");
     gotoxy(x, y + 2);
-    printf("         ");
-    gotoxy(x, y + 3);
-    printf("         ");
+    printf("      ");
+
 }
 void NAVE::mover() {
     if (_kbhit()) {
@@ -227,15 +229,16 @@ void ASTEROIDE::reiniciar() {
 
 void ASTEROIDE::pintar() {
     gotoxy(x, y);
-    cout << " o ";
+    cout << " /**\\";
     gotoxy(x, y + 1);
-    cout << "OoO";
-    gotoxy(x, y + 2);
-    cout << " o ";
+    cout << " \\__/";
+   /* gotoxy(x, y + 2);
+    cout << " 0 ";*/
 }
 void ASTEROIDE::borrar() {
     gotoxy(x, y);     cout << "      ";
     gotoxy(x, y + 1); cout << "      ";
+    //gotoxy(x, y + 2); cout << "    ";
 }
 
 void ASTEROIDE::mover() {
@@ -251,7 +254,7 @@ void ASTEROIDE::mover() {
 
 void ASTEROIDE::choque(class NAVE& N) {
     //verifica la posicion de la nave con el asteroide
-    if (x >= N.X() && x <= N.X() + 7 && y >= N.Y() && y <= N.Y() + 2)
+    if (x >= N.X() && x <= N.X() + 6 && y >= N.Y() && y <= N.Y() + 2)
     {
         N.COR();
         N.borrar();
@@ -286,11 +289,15 @@ public:
 
     void borrar() {
         gotoxy(x, y);
-        cout << " ";
+        cout << "      ";
+        gotoxy(x, y - 1);
+        cout << "      ";
+        gotoxy(x, y - 2);
+        cout << "      ";
     }
 
     bool fuera_de_pantalla() {
-        return (y <= 4); // posicion donde la bala desaparece
+        return (y <= 7); // posicion donde la bala desaparece
     }
 };
 
@@ -305,10 +312,11 @@ int main() {
     int puntos = 0;
     OcultarCursor();
     pintar_limites();
-    NAVE MINAVE(7, 7, 3, 3);
+    NAVE MINAVE(40, 30, 3, 3);
     MINAVE.pintar();
     MINAVE.pintar_corazones();
     mostrar_puntos(puntos);
+    Sleep(5000);
 
     ASTEROIDE EL_ASTEROIDE(10, 4), ast1(15, 10), ast2(1, 3), ast3(5, 4);
 
@@ -334,7 +342,7 @@ int main() {
             MINAVE.mover_abajo();
         }
         if (GetAsyncKeyState('A') & 0x8000) {
-            B.push_back(new BALA(MINAVE.X() + 2, MINAVE.Y() - 1));
+            B.push_back(new BALA(MINAVE.X() + 1, MINAVE.Y() - 1));
         }
 
         for (it = B.begin(); it != B.end();) {
@@ -390,7 +398,7 @@ int main() {
         }
 
 
-
+        
         EL_ASTEROIDE.mover();
         EL_ASTEROIDE.choque(MINAVE);
 
@@ -413,7 +421,7 @@ int main() {
             cout << "Puntaje final: " << puntos;
             gotoxy(45, 24);
             cout << "Presiona una tecla para salir...";
-            _getch();
+            
         }
 
         auto frameEnd = high_resolution_clock::now();
@@ -425,7 +433,7 @@ int main() {
         }
 
     }
-    system("pause");
+    //system("pause");
     return 0;
 
 }
