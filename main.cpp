@@ -305,36 +305,58 @@ void mostrar_puntos(int puntos) {
 }
 
 
-//int main() {
-//    sf::Music music;
-//    if (!music.openFromFile("musica.ogg")) {
-//        std::cerr << "Error al abrir archivo de música\n";
-//        return -1;
-//    }
-//
-//    music.play();
-//    std::cout << "Reproduciendo música...\n";
-//    std::cin.get();
-//
-//    return 0;
-//}
-
-
-
 int main() {
 
-
+   
+    
 
     sf::Music music;
-        if (!music.openFromFile("musica.ogg")) {
+        if (!music.openFromFile("sonido_espacio.ogg")) {
             std::cerr << "Error al abrir archivo de música\n";
             return -1;
         }
     music.setLooping(true);
     // 🔁 Repetir música automáticamente
     music.play();
-    cout << "PRESIONA ENTER PARA INICIAR";
-    cin.get();
+    //cout << "ESCRIBE 'Y' Y PRESIONA ENTER PARA INICIAR";
+    //cin.get();
+
+
+
+    // Cargar el buffer de sonido
+    sf::SoundBuffer buffer1;
+    if (!buffer1.loadFromFile("disparo.wav")) {
+        std::cerr << "Error al cargar disparo.wav\n";
+        return -1;
+    }
+
+    // Crear el sonido con el buffer cargado
+    sf::Sound disparo(buffer1);
+
+
+
+
+
+    sf::Clock relojDisparo;
+    float tiempoEntreDisparos = 0.3f; // en segundos
+
+    // Cargar el buffer de sonido
+    sf::SoundBuffer buffer;
+    if (!buffer.loadFromFile("explosion.wav")) {
+        std::cerr << "Error al cargar disparo.wav\n";
+        return -1;
+    }
+
+    // Crear el sonido con el buffer cargado
+    sf::Sound explosion(buffer);
+
+  
+
+
+
+
+
+
 
 
     int puntos = 0;
@@ -371,10 +393,18 @@ int main() {
         if (GetAsyncKeyState(VK_DOWN) & 0x8000) {
             MINAVE.mover_abajo();
         }
-        //detecta tecla espacio para disparar
         if (GetAsyncKeyState('A') & 0x8000) {
-            B.push_back(new BALA(MINAVE.X() + 2, MINAVE.Y() - 1));
+            if (relojDisparo.getElapsedTime().asSeconds() >= tiempoEntreDisparos) {
+                disparo.play(); // Reproduce el sonido de disparo
+                B.push_back(new BALA(MINAVE.X() + 2, MINAVE.Y() - 1)); // Crea la bala
+                relojDisparo.restart(); // Reinicia el temporizador
+            }
         }
+        //detecta tecla espacio para disparar
+        //if (GetAsyncKeyState('A') & 0x8000) {
+        //    sonido.play();    //reproduce el disparo
+        //    B.push_back(new BALA(MINAVE.X() + 2, MINAVE.Y() - 1));
+        //}
 
         for (it = B.begin(); it != B.end();) {
             (*it)->mover();
@@ -439,9 +469,10 @@ int main() {
         ast2.choque(MINAVE);
         ast3.mover();
         ast3.choque(MINAVE);
-
         MINAVE.morir();
         if (MINAVE.Vidas() == 0) {
+            explosion.play(); // Reproduce el sonido de disparo
+            
             game_over = true;
             music.setLooping(false); //detener la musica
         }
