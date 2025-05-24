@@ -1,0 +1,84 @@
+🛠️ Configurar SFML en Visual Studio (para C++)
+1. 📦 Descarga la versión correcta de SFML
+Ve a https://www.sfml-dev.org/download.php
+Descarga:
+
+"SFML 2.6.1 - Visual C++ 15 (2017) - 32-bit o 64-bit", según tu versión de Visual Studio (la mayoría usa 64-bit).
+
+Descomprime el archivo, por ejemplo en:
+
+makefile
+Copiar
+Editar
+C:\SFML\
+2. 🏗️ Crea un proyecto nuevo en Visual Studio
+Abre Visual Studio.
+
+Nuevo proyecto > C++ > “Proyecto de aplicación de consola”.
+
+Nombra tu proyecto, por ejemplo SFML_Audio_Test.
+
+3. ⚙️ Configura las rutas
+Haz clic derecho en tu proyecto → Propiedades
+
+Selecciona "Configuración: Todas las configuraciones" y "Plataforma: x64" si usas 64-bit.
+
+📁 A) Agregar rutas a los encabezados y librerías:
+C/C++ → General → Directorios de inclusión adicionales:
+
+makefile
+Copiar
+Editar
+C:\SFML\include
+Vinculador → General → Directorios de bibliotecas adicionales:
+
+vbnet
+Copiar
+Editar
+C:\SFML\lib
+🔗 B) Vincula las bibliotecas
+Vinculador → Entrada → Dependencias adicionales:
+
+Agrega:
+
+vbnet
+Copiar
+Editar
+sfml-audio-d.lib
+sfml-system-d.lib
+⚠️ Usa los nombres con -d si estás en modo Debug.
+En modo Release, usa: sfml-audio.lib, sfml-system.lib
+
+4. 📂 Copia las DLL al lado del EXE
+Ve a la carpeta C:\SFML\bin y copia estos archivos al lado de tu .exe (o al directorio Debug):
+
+sfml-audio-d-2.dll
+
+sfml-system-d-2.dll
+
+También openal32.dll
+
+Sin estas DLL, tu programa compilará pero no ejecutará (error al iniciar).
+
+5. 🧪 Código de prueba
+cpp
+Copiar
+Editar
+#include <SFML/Audio.hpp>
+#include <iostream>
+
+int main() {
+    sf::Music music;
+    if (!music.openFromFile("musica.ogg")) {
+        std::cerr << "Error al abrir archivo de música\n";
+        return -1;
+    }
+
+    music.play();
+    std::cout << "Reproduciendo música...\n";
+    std::cin.get();
+
+    return 0;
+}
+Coloca musica.ogg en el mismo directorio que el .exe.
+

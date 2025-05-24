@@ -7,14 +7,17 @@
 
 #include <chrono>
 #include <thread>
+#include <SFML/Audio.hpp>
 
-#define ARRIBA 72
-#define IZQUIERDA 75
-#define DERECHA 77
-#define ABAJO 80
+
 
 using namespace std;
 using namespace std::chrono;
+
+void setColor(int color) {
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleTextAttribute(hConsole, color);
+}
 
 void gotoxy(int x, int y) {
     HANDLE hCon;
@@ -70,8 +73,9 @@ class NAVE {
     int x, y;
     int corazones;
     int vidas;
+    int color;
 public:
-    NAVE(int _x, int _y, int _corazones, int _vidas) : x(_x), y(_y), corazones(_corazones), vidas(_vidas) {}
+    NAVE(int _x, int _y, int _corazones, int _vidas, int _color = 12) : x(_x), y(_y), corazones(_corazones), vidas(_vidas), color(_color) {}
     int X() { return x; };
     int Y() { return y; };
     int Vidas() { return vidas; }
@@ -80,7 +84,7 @@ public:
     }
     void pintar();
     void borrar();
-    void mover();
+
     void pintar_corazones();
     void morir();
 
@@ -120,9 +124,9 @@ public:
 };
 
 
-
 void NAVE::pintar() {
     gotoxy(x, y);
+    setColor(12);
     //printf(" /\\\n");
     cout << "  /\\";
     gotoxy(x, y + 1);
@@ -133,7 +137,7 @@ void NAVE::pintar() {
     cout << " \\vv/";
     //gotoxy(x, y + 3);
     //printf(" vv\n");
-
+    setColor(7);
 }
 void NAVE::borrar() {
     gotoxy(x, y);
@@ -144,19 +148,7 @@ void NAVE::borrar() {
     printf("      ");
 
 }
-void NAVE::mover() {
-    if (_kbhit()) {
-        char tecla = _getch();
-        borrar();
-        if (tecla == IZQUIERDA && x > 3) x--;
-        if (tecla == DERECHA && x + 6 < 77) x++;
-        if (tecla == ARRIBA && y > 4) y--;
-        if (tecla == ABAJO && y + 3 < 33) y++;
-        if (tecla == 'e') corazones--;
-        pintar();
-        pintar_corazones();
-    }
-}
+
 //vidas en corazones
 void NAVE::pintar_corazones() {
 
@@ -208,8 +200,9 @@ void NAVE::morir() {
 
 class ASTEROIDE {
     int x, y;
+    int color;
 public:
-    ASTEROIDE(int _x, int _y) : x(_x), y(_y) {}
+    ASTEROIDE(int _x, int _y, int _color = 'd') : x(_x), y(_y), color(_color) {}
     void pintar();
     void mover();
     void borrar();
@@ -229,11 +222,13 @@ void ASTEROIDE::reiniciar() {
 
 void ASTEROIDE::pintar() {
     gotoxy(x, y);
+
     cout << " /**\\";
     gotoxy(x, y + 1);
     cout << " \\__/";
    /* gotoxy(x, y + 2);
     cout << " 0 ";*/
+
 }
 void ASTEROIDE::borrar() {
     gotoxy(x, y);     cout << "      ";
@@ -285,6 +280,8 @@ public:
     void pintar() {
         gotoxy(x, y);
         cout << "*";
+
+
     }
 
     void borrar() {
@@ -307,18 +304,51 @@ void mostrar_puntos(int puntos) {
     cout << "Puntos: " << puntos;
 }
 
+
+//int main() {
+//    sf::Music music;
+//    if (!music.openFromFile("musica.ogg")) {
+//        std::cerr << "Error al abrir archivo de música\n";
+//        return -1;
+//    }
+//
+//    music.play();
+//    std::cout << "Reproduciendo música...\n";
+//    std::cin.get();
+//
+//    return 0;
+//}
+
+
+
 int main() {
+
+
+
+    sf::Music music;
+        if (!music.openFromFile("musica.ogg")) {
+            std::cerr << "Error al abrir archivo de música\n";
+            return -1;
+        }
+    music.setLooping(true);
+    // 🔁 Repetir música automáticamente
+    music.play();
+    cout << "PRESIONA ENTER PARA INICIAR";
+    cin.get();
+
 
     int puntos = 0;
     OcultarCursor();
     pintar_limites();
     NAVE MINAVE(40, 30, 3, 3);
+
     MINAVE.pintar();
+
     MINAVE.pintar_corazones();
     mostrar_puntos(puntos);
-    Sleep(5000);
+    //Sleep(5000);
 
-    ASTEROIDE EL_ASTEROIDE(10, 4), ast1(15, 10), ast2(1, 3), ast3(5, 4);
+    ASTEROIDE EL_ASTEROIDE(10, 4), ast1(15, 10), ast2(8, 4), ast3(17, 4);
 
     list<BALA*> B;
     list<BALA*>::iterator it;
@@ -328,7 +358,7 @@ int main() {
     while (!game_over) {
         auto frameStart = high_resolution_clock::now();
 
-        // 👇 Detectar teclas presionadas
+        // Detectar teclas presionadas
         if (GetAsyncKeyState(VK_LEFT) & 0x8000) {
             MINAVE.mover_izquierda();
         }
@@ -341,8 +371,9 @@ int main() {
         if (GetAsyncKeyState(VK_DOWN) & 0x8000) {
             MINAVE.mover_abajo();
         }
+        //detecta tecla espacio para disparar
         if (GetAsyncKeyState('A') & 0x8000) {
-            B.push_back(new BALA(MINAVE.X() + 1, MINAVE.Y() - 1));
+            B.push_back(new BALA(MINAVE.X() + 2, MINAVE.Y() - 1));
         }
 
         for (it = B.begin(); it != B.end();) {
@@ -412,6 +443,7 @@ int main() {
         MINAVE.morir();
         if (MINAVE.Vidas() == 0) {
             game_over = true;
+            music.setLooping(false); //detener la musica
         }
         if (game_over) {
             system("cls"); // Limpia la pantalla
@@ -433,7 +465,6 @@ int main() {
         }
 
     }
-    //system("pause");
     return 0;
 
 }
