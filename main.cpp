@@ -316,7 +316,7 @@ int main() {
             return -1;
         }
     music.setLooping(true);
-    // 🔁 Repetir música automáticamente
+    //  Repetir música automáticamente
     music.play();
     //cout << "ESCRIBE 'Y' Y PRESIONA ENTER PARA INICIAR";
     //cin.get();
