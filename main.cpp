@@ -1,4 +1,4 @@
-﻿#include <stdio.h>
+#include <stdio.h>
 #include <iostream>
 #include <windows.h>
 #include <conio.h>
@@ -7,7 +7,7 @@
 
 #include <chrono>
 #include <thread>
-#include <SFML/Audio.hpp>
+// #include <SFML/Audio.hpp>
 
 
 
@@ -310,45 +310,45 @@ int main() {
    
     
 
-    sf::Music music;
-        if (!music.openFromFile("sonido_espacio.ogg")) {
-            std::cerr << "Error al abrir archivo de música\n";
-            return -1;
-        }
-    music.setLooping(true);
-    //  Repetir música automáticamente
-    music.play();
+    // sf::Music music;
+    //     if (!music.openFromFile("sonido_espacio.ogg")) {
+    //         std::cerr << "Error al abrir archivo de música\n";
+    //         return -1;
+    //     }
+    // music.setLooping(true);
+    // //  Repetir música automáticamente
+    // music.play();
     //cout << "ESCRIBE 'Y' Y PRESIONA ENTER PARA INICIAR";
     //cin.get();
 
 
 
     // Cargar el buffer de sonido
-    sf::SoundBuffer buffer1;
-    if (!buffer1.loadFromFile("disparo.wav")) {
-        std::cerr << "Error al cargar disparo.wav\n";
-        return -1;
-    }
+    // sf::SoundBuffer buffer1;
+    // if (!buffer1.loadFromFile("disparo.wav")) {
+        // std::cerr << "Error al cargar disparo.wav\n";
+        // return -1;
+    // }
 
     // Crear el sonido con el buffer cargado
-    sf::Sound disparo(buffer1);
+    // sf::Sound disparo(buffer1);
 
 
 
 
 
-    sf::Clock relojDisparo;
-    float tiempoEntreDisparos = 0.3f; // en segundos
+    // sf::Clock relojDisparo;
+    // float tiempoEntreDisparos = 0.3f; // en segundos
 
-    // Cargar el buffer de sonido
-    sf::SoundBuffer buffer;
-    if (!buffer.loadFromFile("explosion.wav")) {
-        std::cerr << "Error al cargar disparo.wav\n";
-        return -1;
-    }
+    // // Cargar el buffer de sonido
+    // sf::SoundBuffer buffer;
+    // if (!buffer.loadFromFile("explosion.wav")) {
+    //     std::cerr << "Error al cargar disparo.wav\n";
+    //     return -1;
+    // }
 
     // Crear el sonido con el buffer cargado
-    sf::Sound explosion(buffer);
+    // sf::Sound explosion(buffer);
 
   
 
@@ -394,11 +394,11 @@ int main() {
             MINAVE.mover_abajo();
         }
         if (GetAsyncKeyState('A') & 0x8000) {
-            if (relojDisparo.getElapsedTime().asSeconds() >= tiempoEntreDisparos) {
-                disparo.play(); // Reproduce el sonido de disparo
-                B.push_back(new BALA(MINAVE.X() + 2, MINAVE.Y() - 1)); // Crea la bala
-                relojDisparo.restart(); // Reinicia el temporizador
-            }
+            // if (relojDisparo.getElapsedTime().asSeconds() >= tiempoEntreDisparos) {
+            //     // disparo.play(); // Reproduce el sonido de disparo
+            //     relojDisparo.restart(); // Reinicia el temporizador
+            // }
+            B.push_back(new BALA(MINAVE.X() + 2, MINAVE.Y() - 1)); // Crea la bala
         }
         //detecta tecla espacio para disparar
         //if (GetAsyncKeyState('A') & 0x8000) {
@@ -471,10 +471,10 @@ int main() {
         ast3.choque(MINAVE);
         MINAVE.morir();
         if (MINAVE.Vidas() == 0) {
-            explosion.play(); // Reproduce el sonido de disparo
+            // explosion.play(); // Reproduce el sonido de disparo
             
             game_over = true;
-            music.setLooping(false); //detener la musica
+            // music.setLooping(false); //detener la musica
         }
         if (game_over) {
             system("cls"); // Limpia la pantalla
